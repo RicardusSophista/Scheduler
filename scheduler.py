@@ -21,7 +21,7 @@ import datetime as dt
 import dateutil as du
 
 class Schedule:
-    def __init__(self, interval, increment, shortmonth="last", weekends="Keep", holidays=None):
+    def __init__(self, interval, increment, shortmonth="last", weekends="Keep", holidays=[]):
         self.interval = interval
         self.increment = increment
         self.shortmonth = shortmonth
@@ -53,9 +53,12 @@ class Schedule:
                         break
                     except:
                         i += 1
-                   
+        
         if self.weekends == "Skip":
-            while raw.weekday() > 4:
+            while raw.weekday() > 4 and raw in self.holidays:
+                raw += du.relativedelta.relativedelta(days=1)
+        elif len(self.holidays) > 0:
+            while raw in self.holidays:
                 raw += du.relativedelta.relativedelta(days=1)
         
         return raw
