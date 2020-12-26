@@ -29,6 +29,11 @@ class Schedule:
         self.holidays = holidays
 
     def nth_term(self, start, count, incr_1=None, underlying=None):
+        if count == 0:
+            return start
+        elif count == 1 and incr_1 != None:
+            return incr_1
+        
         delta = count * self.increment
         if self.interval == "week":
             raw = start + du.relatvedelta.relativedelta(weeks =+ delta)
