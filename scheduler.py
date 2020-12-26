@@ -21,7 +21,7 @@ import datetime as dt
 import dateutil as du
 
 class Schedule:
-    def __init__(self, interval, increment, shortmonth="last" ,weekends="Keep",holidays=None):
+    def __init__(self, interval, increment, shortmonth="last", weekends="Keep", holidays=None):
         self.interval = interval
         self.increment = increment
         self.shortmonth = shortmonth
@@ -45,18 +45,18 @@ class Schedule:
                 change = dt.datetime(raw.year, raw.month+1, 1)
                 raw = change
             else:
-                found = False
                 i = 0
-                while found == False:
-                    input('Going to try ' + str(raw.year) + '/' + str(raw.month) + '/' + str(underlying-i))
+                while True:
                     try:
                         change = dt.datetime(raw.year, raw.month, underlying-i)
                         raw = change
-                        found = True
+                        break
                     except:
                         i += 1
                    
-        
+        if self.weekends == "Skip":
+            while raw.weekday() > 4:
+                raw += du.relativedelta.relativedelta(days=1)
         
         return raw
         
@@ -64,9 +64,9 @@ class Schedule:
     def recite(start, stop=None, term=None, month_1=None):
         sched = []
 
-sched = Schedule("month",1)
+sched = Schedule("month",1,weekends='Skip')
 start_input = input('Input start date >>> ')
 day, month, year = start_input.split('/')
 start = dt.datetime(int(year), int(month), int(day))
 
-print(sched.nth_term(start,2,underlying=31))
+print(sched.nth_term(start,1))
