@@ -21,11 +21,10 @@ import datetime as dt
 import dateutil as du
 
 class Schedule:
-    def __init__(self, interval, increment, shortmonth="last", monthend="No",weekends="Keep",holidays=None):
+    def __init__(self, interval, increment, shortmonth="last" ,weekends="Keep",holidays=None):
         self.interval = interval
         self.increment = increment
         self.shortmonth = shortmonth
-        self.monthend = monthend
         self.weekends = weekends
         self.holidays = holidays
 
@@ -38,6 +37,27 @@ class Schedule:
         else:
             raw = start + du.relativedelta.relativedelta(years =+ delta)
         
+        if underlying == None:
+            underlying = start.day
+        
+        if raw.day < underlying:
+            if self.shortmonth == "first":
+                change = dt.datetime(raw.year, raw.month+1, 1)
+                raw = change
+            else:
+                found = False
+                i = 0
+                while found == False:
+                    input('Going to try ' + str(raw.year) + '/' + str(raw.month) + '/' + str(underlying-i))
+                    try:
+                        change = dt.datetime(raw.year, raw.month, underlying-i)
+                        raw = change
+                        found = True
+                    except:
+                        i += 1
+                   
+        
+        
         return raw
         
 
@@ -49,4 +69,4 @@ start_input = input('Input start date >>> ')
 day, month, year = start_input.split('/')
 start = dt.datetime(int(year), int(month), int(day))
 
-print(sched.nth_term(start,1))
+print(sched.nth_term(start,2,underlying=31))
