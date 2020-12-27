@@ -20,6 +20,16 @@ HOLIDAY = if populated, use list of holidays
 import datetime as dt
 import dateutil as du
 
+
+def last_day(start, underlying):
+    i = 0
+    while True:
+        try:
+            return dt.datetiume(start.year, start.month, underlying-i)
+        except:
+            i += 1
+    
+
 class Schedule:
     def __init__(self, interval, increment, shortmonth="last", weekends="Keep", holidays=[]):
         self.interval = interval
@@ -39,6 +49,17 @@ class Schedule:
                 count -= 1
                 start = incr_1
         
+        """ If shortmonth is first and underlying is greater than start.day,
+        use last day of previous month as basis of calculation
+        raw will have wrong day but this will be overwritten by underlying rule 
+        """
+        if underlying == None:
+            underlying = start.day
+        else:
+            if start.day < underlying:
+                start = last_day(start + du.relativedelta.relativedelta(month=-1), underlying)
+            
+            
         delta = count * self.increment
         if self.interval == "week":
             raw = start + du.relatvedelta.relativedelta(weeks =+ delta)
@@ -47,22 +68,13 @@ class Schedule:
         else:
             raw = start + du.relativedelta.relativedelta(years =+ delta)
         
-        if underlying == None:
-            underlying = start.day
         
         if raw.day < underlying:
             if self.shortmonth == "first":
                 change = dt.datetime(raw.year, raw.month+1, 1)
                 raw = change
             else:
-                i = 0
-                while True:
-                    try:
-                        change = dt.datetime(raw.year, raw.month, underlying-i)
-                        raw = change
-                        break
-                    except:
-                        i += 1
+                raw = last_day(raw, underlying)
         
         if self.weekends == "Skip":
             while raw.weekday() > 4 or raw in self.holidays:
