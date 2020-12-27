@@ -30,9 +30,14 @@ class Schedule:
 
     def nth_term(self, start, count, incr_1=None, underlying=None):
         if count == 0:
-            return start
-        elif count == 1 and incr_1 != None:
-            return incr_1
+            return start.strftime('%d/%m/%Y')
+        
+        if incr_1:
+            if count == 1:
+                return incr_1.strftime('%d/%m/%Y')
+            else:
+                count -= 1
+                start = incr_1
         
         delta = count * self.increment
         if self.interval == "week":
@@ -92,7 +97,10 @@ sched = Schedule("month",1,weekends='Skip')
 start_input = input('Input start date >>> ')
 day, month, year = start_input.split('/')
 start = dt.datetime(int(year), int(month), int(day))
+incr_1_input = input('Input first increment >>> ')
+day, month, year = incr_1_input.split('/')
+incr_1 = dt.datetime(int(year), int(month), int(day))
 
 term = int(input('Input term >>> '))
 
-print(sched.recite(start, term=term))
+print(sched.recite(start, term=term, incr_1=incr_1))
