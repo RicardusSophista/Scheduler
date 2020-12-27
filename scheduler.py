@@ -60,21 +60,39 @@ class Schedule:
                         i += 1
         
         if self.weekends == "Skip":
-            while raw.weekday() > 4 and raw in self.holidays:
+            while raw.weekday() > 4 or raw in self.holidays:
                 raw += du.relativedelta.relativedelta(days=1)
         elif len(self.holidays) > 0:
             while raw in self.holidays:
                 raw += du.relativedelta.relativedelta(days=1)
         
-        return raw
+        return raw.strftime('%d/%m/%Y')
         
 
-    def recite(start, stop=None, term=None, month_1=None):
-        sched = []
-
+    def recite(self, start, stop=None, term=None, incr_1=None, underlying=None):
+        seq = []
+        
+        if term:
+            for i in range(term + 1):
+                seq.append(self.nth_term(start, i, incr_1, underlying))
+        
+        if stop:
+            i = 0
+            nxt = self.nth_term(start, i, incr_1, underlying)
+            while nxt <= stop:
+                seq.append(nxt)
+                i += 1
+                nxt = self.nth_term(start, i, incr_1, underlying)
+        
+        return seq
+                
+    
+    
 sched = Schedule("month",1,weekends='Skip')
 start_input = input('Input start date >>> ')
 day, month, year = start_input.split('/')
 start = dt.datetime(int(year), int(month), int(day))
 
-print(sched.nth_term(start,1))
+term = int(input('Input term >>> '))
+
+print(sched.recite(start, term=term))
