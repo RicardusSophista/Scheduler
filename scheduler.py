@@ -104,15 +104,55 @@ class Schedule:
         return seq
                 
     
+def test_methods():
+    print('1. Create schedule rules')
     
-sched = Schedule("month",1,weekends='Skip')
-start_input = input('Input start date >>> ')
-day, month, year = start_input.split('/')
-start = dt.datetime(int(year), int(month), int(day))
-incr_1_input = input('Input first increment >>> ')
-day, month, year = incr_1_input.split('/')
-incr_1 = dt.datetime(int(year), int(month), int(day))
+    basis_input = input('\nInput the schedule basis W(eek) / M(onth) / Y(ear) >>> ').upper()
+    b_keys = {'W': 'week', 'M': 'month', 'Y': 'year'}
+    basis = b_keys[basis_input] 
+    
+    increment = int(input('Input the schedule increment (i.e., once every [increment] {}(s)) >>> ').format(basis))
+    
+    weekends = input('Should the schedule skip over weekends [Y/N]?').upper()
+    
+    shortmonth = input('If a date does not occur in the month, should the schedule move to the last day of that month, or the first day of next month?').upper()
+    
+    sched = Schedule(basis, increment, shortmonth=shortmonth, weekends=weekends)
+    
+    print('\n2. Create a sequence')
+    start_input = input('Input start date >>> ')
+    day, month, year = start_input.split('/')
+    start = dt.datetime(int(year), int(month), int(day))
+    
+    q = input('Do you want to specify an incr_1 value Y/N?').upper()
+    if q == 'Y':
+        incr_1_input = input('Input first increment >>> ')
+        day, month, year = incr_1_input.split('/')
+        incr_1 = dt.datetime(int(year), int(month), int(day))
+    else:
+        incr_1 = None
+    
+    q = None
+    if basis != 'week':
+        q = input('Do you want to specify an underlying date value [Y/N]? >>> ').upper()
+    if q == 'Y':
+        underlying = int(input('Input the underlying day >>> '))
+    else:
+        underlying = None
+        
+    
+    q = input('Do you want to specify an end date or a term E/T?').upper()
+    if q == 'E':
+        stop_input = input('Input end date >>>> ')
+        day, month, year =  stop_input.split('/')
+        stop = dt.datetime(year, month, day)
+        term = None
+    else:
+        term = int(input('Input the term >>> '))
+        stop = None
+        
 
-term = int(input('Input term >>> '))
+    print(sched.recite(start, stop=stop, term=term, incr_1=incr_1, underlying=underlying))
 
-print(sched.recite(start, term=term, incr_1=incr_1))
+if __name__ == "__main__":
+    test_methods()
