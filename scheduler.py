@@ -25,7 +25,7 @@ def last_day(start, underlying):
     i = 0
     while True:
         try:
-            return dt.datetiume(start.year, start.month, underlying-i)
+            return dt.datetime(start.year, start.month, underlying-i)
         except:
             i += 1
     
@@ -57,8 +57,10 @@ class Schedule:
             underlying = start.day
         else:
             if start.day < underlying:
-                start = last_day(start + du.relativedelta.relativedelta(month=-1), underlying)
-            
+                start = last_day(start + du.relativedelta.relativedelta(months=-1), underlying)
+            else:
+                diff = underlying - start.day
+                start += du.relativedelta.relativedelta(days=diff)
             
         delta = count * self.increment
         if self.interval == "week":
@@ -70,12 +72,17 @@ class Schedule:
         
         
         if raw.day < underlying:
-            if self.short_to_next() == True:
+            """ This is to catch the edge scenario in which the start date is 1st March
+            but this has been bumped from an underlying date of 30th/31st.
+            The previous step will give an underlying start date of 28th/29th February
+            so this needs to be moved to 30th/31st if available"""
+            test = last_day(raw, underlying)            
+            if self.short_to_next == True and test.day != underlying:
                 change = dt.datetime(raw.year, raw.month+1, 1)
                 raw = change
             else:
-                raw = last_day(raw, underlying)
-        
+                raw = test
+                
         if self.skip_wkend == True:
             while raw.weekday() > 4 or raw in self.holidays:
                 raw += du.relativedelta.relativedelta(days=1)
