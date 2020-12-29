@@ -11,7 +11,7 @@ FIRST = short month > first day of next month
 LAST = short month > last day of month
 
 YES = day1 is last day of month
-NO = day1 is regular day of month
+    NO = day1 is regular day of month
 
 WEEKENDS = if SKIP, do not use weekends
 HOLIDAY = if populated, use list of holidays
@@ -31,11 +31,11 @@ def last_day(start, underlying):
     
 
 class Schedule:
-    def __init__(self, interval, increment, shortmonth="last", weekends="Keep", holidays=[]):
+    def __init__(self, interval, increment, short_to_next=False, skip_wkend=False, holidays=[]):
         self.interval = interval
         self.increment = increment
-        self.shortmonth = shortmonth
-        self.weekends = weekends
+        self.short_to_next = short_to_next
+        self.skip_wkend = skip_wkend
         self.holidays = holidays
 
     def nth_term(self, start, count, incr_1=None, underlying=None):
@@ -70,13 +70,13 @@ class Schedule:
         
         
         if raw.day < underlying:
-            if self.shortmonth == "first":
+            if self.short_to_next() == True:
                 change = dt.datetime(raw.year, raw.month+1, 1)
                 raw = change
             else:
                 raw = last_day(raw, underlying)
         
-        if self.weekends == "Skip":
+        if self.skip_wkend == True:
             while raw.weekday() > 4 or raw in self.holidays:
                 raw += du.relativedelta.relativedelta(days=1)
         elif len(self.holidays) > 0:
@@ -113,11 +113,14 @@ def test_methods():
     
     increment = int(input('Input the schedule increment (i.e., once every [increment] {}(s)) >>> ').format(basis))
     
-    weekends = input('Should the schedule skip over weekends [Y/N]?').upper()
+    wkend_input = input('Should the schedule skip over weekends [Y/N]?').upper()
+    y_to_true = {'Y': True, 'N': False}
+    skip_wkend = y_to_true[wkend_input]
     
-    shortmonth = input('If a date does not occur in the month, should the schedule move to the last day of that month, or the first day of next month?').upper()
+    short_input = input('If a date does not occur in the month, should the schedule move to the first day of next month [Y/N]?').upper()
+    short_to_next = y_to_true[short_input]
     
-    sched = Schedule(basis, increment, shortmonth=shortmonth, weekends=weekends)
+    sched = Schedule(basis, increment, short_to_next=short_to_next, skip_wkend=skip_wkend)
     
     print('\n2. Create a sequence')
     start_input = input('Input start date >>> ')
