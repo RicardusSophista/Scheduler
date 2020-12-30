@@ -55,7 +55,7 @@ class Schedule:
         
         """ If shortmonth is first and underlying is greater than start.day,
         use last day of previous month as basis of calculation
-        raw will have wrong day but this will be overwritten by underlying rule 
+        raw may have wrong day in 'long' months but this will be overwritten by underlying rule 
         """
         if underlying == None:
             underlying = start.day
@@ -68,7 +68,7 @@ class Schedule:
             
         delta = count * self.increment
         if self.interval == "week":
-            raw = start + du.relatvedelta.relativedelta(weeks =+ delta)
+            raw = start + du.relativedelta.relativedelta(weeks =+ delta)
         elif self.interval == "month":
             raw = start + du.relativedelta.relativedelta(months =+ delta)
         else:
