@@ -21,6 +21,10 @@ import datetime as dt
 import dateutil as du
 
 
+def to_date(strdate):
+    day, month, year = strdate.split('/')
+    return dt.datetime(int(year), int(month), int(day))
+
 def last_day(start, underlying):
     i = 0
     while True:
@@ -127,7 +131,15 @@ def test_methods():
     short_input = input('If a date does not occur in the month, should the schedule move to the first day of next month [Y/N]?').upper()
     short_to_next = y_to_true[short_input]
     
-    sched = Schedule(basis, increment, short_to_next=short_to_next, skip_wkend=skip_wkend)
+    q = input('Do you want to make use of a holidays list [Y/N]? ').upper()
+    if q == 'Y':
+        with open('holidays.csv','r') as f:
+            h_list = f.readlines()
+            holidays = [to_date(x) for x in h_list]
+    else:
+        holidays = []
+    
+    sched = Schedule(basis, increment, short_to_next=short_to_next, skip_wkend=skip_wkend, holidays=holidays)
     
     print('\n2. Create a sequence')
     start_input = input('Input start date >>> ')
